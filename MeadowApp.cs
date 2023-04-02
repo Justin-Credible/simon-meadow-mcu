@@ -6,11 +6,9 @@ using Meadow.Foundation.Displays.Lcd;
 using Meadow.Foundation.Leds;
 using Meadow.Foundation.Relays;
 using Meadow.Foundation.Sensors.Buttons;
-using Meadow.Hardware;
 using Meadow.Peripherals.Leds;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace MeadowApp
@@ -48,7 +46,7 @@ namespace MeadowApp
 
         public override Task Initialize()
         {
-            Console.WriteLine("Initialize...");
+            Console.WriteLine("Initialize hardware...");
 
             ledOnboard = new RgbPwmLed(
                 redPwmPin: Device.Pins.OnboardLedRed,
@@ -67,8 +65,6 @@ namespace MeadowApp
                 ledOnboard.SetColor(Color.Red);
                 return base.Initialize();
             }
-
-            Console.WriteLine("Initializing hardware...");
 
             lcdDisplay = new CharacterDisplay(
                 pinRS: MeadowApp.Device.Pins.D10,
@@ -114,6 +110,13 @@ namespace MeadowApp
 
             debug = new DebugManager(lcdDisplay, speaker, effects);
 
+            Console.WriteLine("Initialization complete!");
+
+            return base.Initialize();
+        }
+
+        public override Task Run()
+        {
             Console.WriteLine("Starting attract mode thread...");
             Task.Run(() => AttractMode());
 
@@ -130,13 +133,6 @@ namespace MeadowApp
                 gameState = GameState.Attract;
                 ledOnboard.SetColor(Color.Green);
             }
-
-            return base.Initialize();
-        }
-
-        public override Task Run()
-        {
-            Console.WriteLine("Run...");
 
             return base.Run();
         }
