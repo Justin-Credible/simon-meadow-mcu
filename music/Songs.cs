@@ -1,4 +1,6 @@
 
+using System.Collections.Generic;
+
 class Songs
 {
     /// <summary>
@@ -12,7 +14,8 @@ class Songs
     {
         Tempo = 300,
         Notes = "fcfcfcfac bgbgbgegc ",
-        Beats = {
+        Beats = new List<int>()
+        {
             3, 1, 3, 1, 1, 1, 1, 1, 2, 2,
             3, 1, 3, 1, 1, 1, 1, 1, 2, 2,
         }
@@ -22,6 +25,6 @@ class Songs
     {
         Tempo = 300,
         Notes = "cg",
-        Beats = { 2, 1 }
+        Beats = new List<int>(){ 2, 1 }
     };
 }

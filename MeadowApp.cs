@@ -7,6 +7,7 @@ using Meadow.Foundation.Leds;
 using Meadow.Foundation.Relays;
 using Meadow.Foundation.Sensors.Buttons;
 using Meadow.Peripherals.Leds;
+using Meadow.Peripherals.Relays;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -71,20 +72,20 @@ namespace MeadowApp
             speaker = new PiezoSpeaker(Device.Pins.D04);
 
             buttonRed = new PushButton(Device.Pins.D00);
-            buttonYellow = new PushButton(Device.Pins.D00);
-            buttonGreen = new PushButton(Device.Pins.D00);
-            buttonBlue = new PushButton(Device.Pins.D00);
+            buttonYellow = new PushButton(Device.Pins.D01);
+            buttonGreen = new PushButton(Device.Pins.D13);
+            buttonBlue = new PushButton(Device.Pins.D03);
 
             buttonRed.Clicked += ButtonRed_Clicked;
             buttonYellow.Clicked += ButtonYellow_Clicked;
             buttonGreen.Clicked += ButtonGreen_Clicked;
             buttonBlue.Clicked += ButtonBlue_Clicked;
 
-            relayLedRed = new Relay(Device.Pins.D00);
-            relayLedYellow = new Relay(Device.Pins.D00);
-            relayLedGreen = new Relay(Device.Pins.D00);
-            relayLedBlue = new Relay(Device.Pins.D00);
-            relayWinnerSound = new Relay(Device.Pins.D00);
+            relayLedRed = new Relay(Device.Pins.D11, RelayType.NormallyClosed) { IsOn = false };
+            relayLedYellow = new Relay(Device.Pins.D12, RelayType.NormallyClosed) { IsOn = false };
+            relayLedGreen = new Relay(Device.Pins.D15, RelayType.NormallyClosed) { IsOn = false };
+            relayLedBlue = new Relay(Device.Pins.D14, RelayType.NormallyClosed) { IsOn = false };
+            relayWinnerSound = new Relay(Device.Pins.D02, RelayType.NormallyClosed) { IsOn = false };
 
             Console.WriteLine("Initializing managers...");
 
@@ -99,7 +100,7 @@ namespace MeadowApp
                 relayLedBlue
             );
 
-            debug = new DebugManager(lcdDisplay, speaker, effects);
+            debug = new DebugManager(lcdDisplay, speaker, effects, relayLedRed, relayLedYellow, relayLedGreen, relayLedBlue, relayWinnerSound);
 
             Console.WriteLine("Initialization complete!");
 
@@ -125,7 +126,15 @@ namespace MeadowApp
                 ledOnboard.SetColor(Color.Green);
             }
 
+            blockInput = false;
+
             return base.Run();
+        }
+
+        public override Task OnError(Exception e)
+        {
+            ledOnboard.SetColor(Color.Red);
+            return base.OnError(e);
         }
 
         private void ButtonRed_Clicked(object sender, EventArgs e)

@@ -54,8 +54,8 @@ class EffectsManager
 
         for (var i = 0; i < 10; i++)
         {
-            await player.PlayNote('c', new TimeSpan(0, 0, 0, 0, 300));
-            await Task.Delay(100);
+            await player.PlayNote(note, new TimeSpan(0, 0, 0, 0, 50));
+            await Task.Delay(50);
         }
 
         SetLedState(color, false);
@@ -69,7 +69,7 @@ class EffectsManager
             var note = GetNoteForColor(color);
 
             SetLedState(color, true);
-            await player.PlayNote('c', new TimeSpan(0, 0, 0, 0, 500));
+            await player.PlayNote(note, new TimeSpan(0, 0, 0, 0, 300));
             SetLedState(color, false);
 
             await Task.Delay(100);
@@ -81,7 +81,7 @@ class EffectsManager
         var note = GetNoteForColor(color);
 
         SetLedState(color, true);
-        await player.PlayNote('c', new TimeSpan(0, 0, 0, 0, 500));
+        await player.PlayNote(note, new TimeSpan(0, 0, 0, 0, 300));
         SetLedState(color, false);
     }
 
@@ -137,19 +137,19 @@ class EffectsManager
         await player.PlaySong(Songs.Tada);
     }
 
-    private string GetNoteForColor(GameColor color)
+    private char GetNoteForColor(GameColor color)
     {
         switch (color)
         {
             case GameColor.Red:
-                return "b";
+                return 'b';
             case GameColor.Yellow:
-                return "g";
+                return 'g';
             case GameColor.Green:
-                return "e";
+                return 'e';
             case GameColor.Blue:
             default:
-                return "c";
+                return 'c';
         }
     }
 
