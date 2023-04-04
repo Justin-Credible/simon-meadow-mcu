@@ -57,15 +57,6 @@ namespace MeadowApp
 
             ledOnboard.SetColor(Color.Yellow);
 
-            // TODO: Set pins based on hardware implementation!
-            // Bailing out for now so I don't fry something.
-            if (true)
-            {
-                Console.WriteLine("HALT: Need to set hardware pins.");
-                ledOnboard.SetColor(Color.Red);
-                return base.Initialize();
-            }
-
             lcdDisplay = new CharacterDisplay(
                 pinRS: MeadowApp.Device.Pins.D10,
                 pinE: MeadowApp.Device.Pins.D09,
