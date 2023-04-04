@@ -84,8 +84,8 @@ namespace MeadowApp
             relayLedRed = new Relay(Device.Pins.D11, RelayType.NormallyClosed) { IsOn = false };
             relayLedYellow = new Relay(Device.Pins.D12, RelayType.NormallyClosed) { IsOn = false };
             relayLedGreen = new Relay(Device.Pins.D15, RelayType.NormallyClosed) { IsOn = false };
-            relayLedBlue = new Relay(Device.Pins.D14, RelayType.NormallyClosed) { IsOn = false };
-            relayWinnerSound = new Relay(Device.Pins.D02, RelayType.NormallyClosed) { IsOn = false };
+            relayLedBlue = new Relay(Device.Pins.D02, RelayType.NormallyClosed) { IsOn = false };
+            relayWinnerSound = new Relay(Device.Pins.D14, RelayType.NormallyClosed) { IsOn = false };
 
             Console.WriteLine("Initializing managers...");
 
@@ -162,23 +162,30 @@ namespace MeadowApp
             if (blockInput)
                 return;
 
-            switch (gameState)
-            {
-                case GameState.Attract:
-                    await HandleStartNewGame();
-                    break;
-                case GameState.Playing:
-                    await HandleNewInput(color);
-                    break;
-                case GameState.NameEntry:
-                    await HandleNameEntry(color);
-                    break;
-                case GameState.Debug:
-                    await HandleDebugMenu(color);
-                    break;
-            }
+            blockInput = true;
 
-            blockInput = false;
+            try
+            {
+                switch (gameState)
+                {
+                    case GameState.Attract:
+                        await HandleStartNewGame();
+                        break;
+                    case GameState.Playing:
+                        await HandleNewInput(color);
+                        break;
+                    case GameState.NameEntry:
+                        await HandleNameEntry(color);
+                        break;
+                    case GameState.Debug:
+                        await HandleDebugMenu(color);
+                        break;
+                }
+            }
+            finally
+            {
+                blockInput = false;
+            }
         }
 
         private async Task HandleStartNewGame()

@@ -27,12 +27,13 @@ class EffectsManager
     public async Task PlayGameStart()
     {
         var songTask = player.PlaySong(Songs.GameStart);
-        songTask.Start();
 
         relayLedRed.IsOn = true;
         relayLedYellow.IsOn = false;
         relayLedGreen.IsOn = true;
         relayLedBlue.IsOn = false;
+
+        await Task.Delay(500);
 
         for (var i = 0; i < 5; i++)
         {
@@ -40,8 +41,13 @@ class EffectsManager
             relayLedYellow.Toggle();
             relayLedGreen.Toggle();
             relayLedBlue.Toggle();
-            await Task.Delay(1000);
+            await Task.Delay(500);
         }
+
+        relayLedRed.IsOn = false;
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = false;
 
         await songTask;
     }

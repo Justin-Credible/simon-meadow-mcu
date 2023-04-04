@@ -15,21 +15,18 @@ class PiezoPlayer
 
     public async Task PlaySong(Song song)
     {
-        while (true)
+        for (int i = 0; i < song.Notes.Length; i++)
         {
-            for (int i = 0; i < song.Notes.Length; i++)
+            if (song.Notes[i] == ' ')
             {
-                if (song.Notes[i] == ' ')
-                {
-                    await Task.Delay(song.Beats[i] * song.Tempo); // rest
-                }
-                else
-                {
-                    var duration = new TimeSpan(song.Beats[i] * song.Tempo * 2000);
-                    await PlayNote(song.Notes[i], duration);
-                    // pause between notes
-                    await Task.Delay(song.Beats[i] * song.Tempo / 2);
-                }
+                await Task.Delay(song.Beats[i] * song.Tempo); // rest
+            }
+            else
+            {
+                var duration = new TimeSpan(song.Beats[i] * song.Tempo * 2000);
+                await PlayNote(song.Notes[i], duration);
+                // pause between notes
+                await Task.Delay(song.Beats[i] * song.Tempo / 2);
             }
         }
     }

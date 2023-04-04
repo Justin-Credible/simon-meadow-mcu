@@ -23,8 +23,8 @@ class Songs
 
     public static readonly Song Tada = new Song()
     {
-        Tempo = 300,
-        Notes = "cg",
-        Beats = new List<int>(){ 2, 1 }
+        Tempo = 150,
+        Notes = "ccg",
+        Beats = new List<int>(){ 1, 1, 4 }
     };
 }
