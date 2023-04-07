@@ -24,6 +24,11 @@ class EffectsManager
         this.relayLedBlue = relayLedBlue;
     }
 
+    public async Task PlayHardwareReady()
+    {
+        await player.PlaySong(Songs.Tada);
+    }
+
     public async Task PlayGameStart()
     {
         var songTask = player.PlaySong(Songs.GameStart);
@@ -35,7 +40,26 @@ class EffectsManager
 
         await Task.Delay(500);
 
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 4; i++)
+        {
+            relayLedRed.Toggle();
+            relayLedYellow.Toggle();
+            relayLedGreen.Toggle();
+            relayLedBlue.Toggle();
+            await Task.Delay(500);
+        }
+
+        await LedsChaseFoward();
+        await LedsChaseBackward();
+
+        relayLedRed.IsOn = true;
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = true;
+        relayLedBlue.IsOn = false;
+
+        await Task.Delay(500);
+
+        for (var i = 0; i < 4; i++)
         {
             relayLedRed.Toggle();
             relayLedYellow.Toggle();
@@ -50,6 +74,66 @@ class EffectsManager
         relayLedBlue.IsOn = false;
 
         await songTask;
+    }
+
+    private async Task LedsChaseFoward()
+    {
+        relayLedRed.IsOn = false;
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = false;
+
+        await Task.Delay(200);
+
+        relayLedRed.IsOn = true;
+        await Task.Delay(200);
+
+        relayLedRed.IsOn = false;
+        relayLedYellow.IsOn = true;
+        await Task.Delay(200);
+
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = true;
+        await Task.Delay(200);
+
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = true;
+        await Task.Delay(200);
+
+        relayLedRed.IsOn = false;
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = false;
+    }
+
+    private async Task LedsChaseBackward()
+    {
+        relayLedRed.IsOn = false;
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = false;
+
+        await Task.Delay(200);
+
+        relayLedBlue.IsOn = true;
+        await Task.Delay(200);
+
+        relayLedBlue.IsOn = false;
+        relayLedGreen.IsOn = true;
+        await Task.Delay(200);
+
+        relayLedGreen.IsOn = false;
+        relayLedYellow.IsOn = true;
+        await Task.Delay(200);
+
+        relayLedYellow.IsOn = false;
+        relayLedRed.IsOn = true;
+        await Task.Delay(200);
+
+        relayLedRed.IsOn = false;
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = false;
     }
 
     public async Task PlayFirstRound(GameColor color)
@@ -86,8 +170,10 @@ class EffectsManager
     {
         var note = GetNoteForColor(color);
 
+        var audio = player.PlayNote(note, new TimeSpan(0, 0, 0, 0, 300));
         SetLedState(color, true);
-        await player.PlayNote(note, new TimeSpan(0, 0, 0, 0, 300));
+        await audio;
+        await Task.Delay(100);
         SetLedState(color, false);
     }
 
@@ -98,12 +184,14 @@ class EffectsManager
 
     public async Task PlayRoundFail(GameColor expected)
     {
+        var note = player.PlayNote('c', new TimeSpan(0, 0, 3));
+
         SetLedState(GameColor.Red, expected == GameColor.Red);
         SetLedState(GameColor.Yellow, expected == GameColor.Yellow);
         SetLedState(GameColor.Green, expected == GameColor.Green);
         SetLedState(GameColor.Blue, expected == GameColor.Blue);
 
-        await player.PlayNote('c', new TimeSpan(0, 0, 3));
+        await note;
 
         SetLedState(GameColor.Red, false);
         SetLedState(GameColor.Yellow, false);
@@ -117,17 +205,42 @@ class EffectsManager
 
         relayLedRed.IsOn = true;
         relayLedYellow.IsOn = false;
-        relayLedGreen.IsOn = true;
-        relayLedBlue.IsOn = false;
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = true;
 
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 7; i++)
         {
             relayLedRed.Toggle();
             relayLedYellow.Toggle();
             relayLedGreen.Toggle();
             relayLedBlue.Toggle();
-            await Task.Delay(1000);
+            await Task.Delay(200);
         }
+
+        await LedsChaseFoward();
+        await LedsChaseBackward();
+
+        relayLedRed.IsOn = true;
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = true;
+
+        for (var i = 0; i < 7; i++)
+        {
+            relayLedRed.Toggle();
+            relayLedYellow.Toggle();
+            relayLedGreen.Toggle();
+            relayLedBlue.Toggle();
+            await Task.Delay(200);
+        }
+
+        relayLedRed.IsOn = false;
+        relayLedYellow.IsOn = false;
+        relayLedGreen.IsOn = false;
+        relayLedBlue.IsOn = false;
+
+        await LedsChaseFoward();
+        await LedsChaseBackward();
 
         relayLedRed.IsOn = false;
         relayLedYellow.IsOn = false;

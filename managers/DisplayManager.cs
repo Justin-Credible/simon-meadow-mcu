@@ -13,14 +13,14 @@ class DisplayManager
     // --------------------
     //  Egg Matching Game
     //
-    //     Easter 2024
+    //     Easter 2023
     //  by Justin-Credible
     // --------------------
     public void ShowTitleScreen()
     {
         lcdDisplay.ClearLines();
         lcdDisplay.WriteLine(" Egg Matching Game", 0);
-        lcdDisplay.WriteLine("    Easter 2024", 2);
+        lcdDisplay.WriteLine("    Easter 2023", 2);
         lcdDisplay.WriteLine(" by Justin-Credible", 3);
     }
 
@@ -53,69 +53,96 @@ class DisplayManager
     }
 
     // --------------------
-    //  CONGRATULATIONS!   
+    //   CONGRATULATIONS!  
     //                     
-    //   You got a         
-    //   high score!!!     
+    //     You got a         
+    //    high score!!!     
     // --------------------
     public void ShowCongratsScreen()
     {
         lcdDisplay.ClearLines();
-        lcdDisplay.WriteLine(" CONGRATULATIONS!", 0);
-        lcdDisplay.WriteLine("  You got a", 2);
-        lcdDisplay.WriteLine("  high score!!!", 3);
+        lcdDisplay.WriteLine("  CONGRATULATIONS!", 0);
+        lcdDisplay.WriteLine("    You got a", 2);
+        lcdDisplay.WriteLine("   high score!!!", 3);
     }
 
     // --------------------
-    //  Round 24
+    //       Round 24      
     //
-    // Watch closely...
+    //   Watch closely...
     //
     // --------------------
-    public void ShowWaitScreen(int round)
+    public void ShowWaitScreen(int round, bool partialUpdate = false)
     {
-        lcdDisplay.ClearLines();
-        lcdDisplay.WriteLine($" Round {round}", 0);
-        lcdDisplay.WriteLine("Watch closely...", 2);
+        if (!partialUpdate)
+        {
+            lcdDisplay.ClearLines();
+            lcdDisplay.WriteLine($"      Round {round}", 0);
+        }
+        else
+        {
+            lcdDisplay.SetCursorPosition(12, 0);
+            lcdDisplay.WriteLine($"{round}", 0);
+        }
+
+        lcdDisplay.WriteLine("  Watch closely...", 2);
     }
 
     // --------------------
-    //  Round 24
+    //       Round 24      
     //
-    // Now you try...
+    //     Now you try...
     //
     // --------------------
-    public void ShowYourTurnScreen(int round)
+    public void ShowYourTurnScreen(int round, bool partialUpdate = false)
     {
-        lcdDisplay.ClearLines();
-        lcdDisplay.WriteLine($" Round {round}", 0);
-        lcdDisplay.WriteLine("Now you try...", 2);
+        if (!partialUpdate)
+        {
+            lcdDisplay.ClearLines();
+            lcdDisplay.WriteLine($"      Round {round}", 0);
+        }
+        else
+        {
+            lcdDisplay.SetCursorPosition(12, 0);
+            lcdDisplay.WriteLine($"{round}", 0);
+        }
+
+        lcdDisplay.WriteLine("    Now you try...", 2);
     }
 
     // --------------------
-    //  Round 24
+    //       Round 24      
     //
-    //       Great!
+    //        Great!!
     //
     // --------------------
-    public void ShowRoundWin(int round)
+    public void ShowRoundWin(int round, bool partialUpdate = false)
     {
-        lcdDisplay.ClearLines();
-        lcdDisplay.WriteLine($" Round {round}", 0);
-        lcdDisplay.WriteLine("      Great!", 2);
+        if (!partialUpdate)
+        {
+            lcdDisplay.ClearLines();
+            lcdDisplay.WriteLine($"      Round {round}", 0);
+        }
+        else
+        {
+            lcdDisplay.SetCursorPosition(12, 0);
+            lcdDisplay.WriteLine($"{round}", 0);
+        }
+
+        lcdDisplay.WriteLine("       Great!!", 2);
     }
 
     // --------------------
     //  Round 24 - FAILED
     //
-    //      OH NO!
-    //    GAME OVER!
+    //       OH NO!
+    //     GAME OVER!
     // --------------------
     public void ShowGameOverScreen(int round)
     {
         lcdDisplay.ClearLines();
         lcdDisplay.WriteLine($" Round {round} - FAILED", 0);
-        lcdDisplay.WriteLine("     OH NO!", 2);
-        lcdDisplay.WriteLine("   GAME OVER!", 3);
+        lcdDisplay.WriteLine("      OH NO!", 2);
+        lcdDisplay.WriteLine("    GAME OVER!", 3);
     }
 }

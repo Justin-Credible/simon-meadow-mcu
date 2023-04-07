@@ -88,6 +88,11 @@ class DebugManager
         this.relayLedGreen = relayLedGreen;
         this.relayLedBlue = relayLedBlue;
         this.relayWinnerSound = relayWinnerSound;
+
+        selection = Selections.FindIndex(0, Selections.Count, (m) => m == FN_ExitDebug);
+
+        if (selection == -1)
+            selection = 0;
     }
 
     // --------------------

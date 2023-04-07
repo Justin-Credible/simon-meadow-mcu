@@ -33,6 +33,7 @@ namespace MeadowApp
 
         private bool debugEnabled = true; // TODO: Set to false once done debugging.
         private bool blockInput = true;
+        private bool playNewGameEffect = true;
 
         private GameState gameState = GameState.Attract;
         private List<GameColor> pattern = new List<GameColor>();
@@ -116,7 +117,7 @@ namespace MeadowApp
             {
                 Console.WriteLine("Staring debug mode...");
                 gameState = GameState.Debug;
-                ledOnboard.SetColor(Color.Purple);
+                ledOnboard.SetColor(Color.White);
                 debug.ShowMenu();
             }
             else
@@ -126,6 +127,7 @@ namespace MeadowApp
                 ledOnboard.SetColor(Color.Green);
             }
 
+            Task.Run(() => effects.PlayHardwareReady());
             blockInput = false;
 
             return base.Run();
@@ -195,17 +197,33 @@ namespace MeadowApp
             input.Clear();
             pattern.Clear();
 
+            await Task.Delay(100);
             display.ShowGetReady();
-            await effects.PlayGameStart();
+            await Task.Delay(100);
+
+            if (playNewGameEffect)
+            {
+                await effects.PlayGameStart();
+                playNewGameEffect = false;
+            }
+            else
+            {
+                await Task.Delay(2000);
+            }
 
             await StartNextRound();
         }
 
         private async Task StartNextRound()
         {
+            input.Clear();
             pattern.Add(GetNextColor());
 
-            display.ShowWaitScreen(pattern.Count);
+            // We only need to update the entire display the first round.
+            // Between each subsequent round we only need to update a smaller portion.
+            bool partialScreenUpdate = input.Count > 0;
+
+            display.ShowWaitScreen(pattern.Count, partialScreenUpdate);
 
             if (pattern.Count == 1)
             {
@@ -216,7 +234,7 @@ namespace MeadowApp
                 await effects.PlayNextRound(pattern);
             }
 
-            display.ShowYourTurnScreen(pattern.Count);
+            display.ShowYourTurnScreen(pattern.Count, partialScreenUpdate);
         }
 
         private async Task HandleNewInput(GameColor actual)
@@ -231,22 +249,25 @@ namespace MeadowApp
 
                 if (input.Count == pattern.Count)
                 {
-                    display.ShowRoundWin(pattern.Count);
-                    await effects.PlayRoundWin();
+                    var roundWinEffect = effects.PlayRoundWin();
+                    display.ShowRoundWin(pattern.Count, partialUpdate: true);
+                    await roundWinEffect;
                     await StartNextRound();
                 }
             }
             else
             {
+                var roundFailEffect = effects.PlayRoundFail(expected);
                 display.ShowGameOverScreen(pattern.Count);
-                await effects.PlayRoundFail(expected);
+                await roundFailEffect;
 
                 var score = pattern.Count - 1;
 
                 if (highScore.IsHighScore(score))
                 {
+                    var highScoreEffect = effects.PlayHighScore();
                     display.ShowCongratsScreen();
-                    await effects.PlayHighScore();
+                    await highScoreEffect;
                     highScore.StartEntry(score);
                     gameState = GameState.NameEntry;
                 }
@@ -323,6 +344,7 @@ namespace MeadowApp
             }
             else if (action == DebugAction.Exit)
             {
+                ledOnboard.SetColor(Color.Green);
                 gameState = GameState.Attract;
             }
         }
@@ -338,23 +360,39 @@ namespace MeadowApp
                 }
 
                 display.ShowTitleScreen();
-                await Task.Delay(3000);
 
-                if (gameState != GameState.Attract) { continue; }
+                for (var i = 0; i < 10; i++)
+                {
+                    await Task.Delay(500);
+                    if (gameState != GameState.Attract) { continue; }
+                }
 
                 display.ShowAttractScreen();
-                await Task.Delay(3000);
 
-                if (gameState != GameState.Attract) { continue; }
+                for (var i = 0; i < 10; i++)
+                    await Task.Delay(500);
+
+                for (var i = 0; i < 15; i++)
+                {
+                    await Task.Delay(500);
+                    if (gameState != GameState.Attract) { continue; }
+                }
 
                 highScore.ShowHighScores();
-                await Task.Delay(3000);
+
+                for (var i = 0; i < 5; i++)
+                {
+                    await Task.Delay(500);
+                    if (gameState != GameState.Attract) { continue; }
+                }
+
+                playNewGameEffect = true;
             }
         }
 
         private GameColor GetNextColor()
         {
-            return (GameColor)random.Next(1, 4);
+            return (GameColor)random.Next(0, 4);
         }
     }
 }
