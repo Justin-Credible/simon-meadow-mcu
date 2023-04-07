@@ -82,7 +82,7 @@ class DisplayManager
         else
         {
             lcdDisplay.SetCursorPosition(12, 0);
-            lcdDisplay.WriteLine($"{round}", 0);
+            lcdDisplay.Write($"{round}");
         }
 
         lcdDisplay.WriteLine("  Watch closely...", 2);
@@ -104,7 +104,7 @@ class DisplayManager
         else
         {
             lcdDisplay.SetCursorPosition(12, 0);
-            lcdDisplay.WriteLine($"{round}", 0);
+            lcdDisplay.Write($"{round}");
         }
 
         lcdDisplay.WriteLine("    Now you try...", 2);
@@ -126,7 +126,7 @@ class DisplayManager
         else
         {
             lcdDisplay.SetCursorPosition(12, 0);
-            lcdDisplay.WriteLine($"{round}", 0);
+            lcdDisplay.Write($"{round}");
         }
 
         lcdDisplay.WriteLine("       Great!!", 2);

@@ -10,6 +10,7 @@ using Meadow.Peripherals.Leds;
 using Meadow.Peripherals.Relays;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MeadowApp
@@ -31,7 +32,7 @@ namespace MeadowApp
         private Relay relayLedBlue;
         private Relay relayWinnerSound;
 
-        private bool debugEnabled = true; // TODO: Set to false once done debugging.
+        private bool debugEnabled = true;
         private bool blockInput = true;
         private bool playNewGameEffect = true;
 
@@ -39,6 +40,7 @@ namespace MeadowApp
         private List<GameColor> pattern = new List<GameColor>();
         private List<GameColor> input = new List<GameColor>();
         private Random random = new Random((int)DateTime.Now.Ticks);
+        private CancellationTokenSource attractModeCancelleationTokenSource;
 
         private HighScoreManager highScore;
         private DisplayManager display;
@@ -110,8 +112,7 @@ namespace MeadowApp
 
         public override Task Run()
         {
-            Console.WriteLine("Starting attract mode thread...");
-            Task.Run(() => AttractMode());
+            Thread.CurrentThread.Name = "Main";
 
             if (debugEnabled)
             {
@@ -125,6 +126,7 @@ namespace MeadowApp
                 Console.WriteLine("Ready!");
                 gameState = GameState.Attract;
                 ledOnboard.SetColor(Color.Green);
+                StartAttractMode();
             }
 
             Task.Run(() => effects.PlayHardwareReady());
@@ -192,6 +194,7 @@ namespace MeadowApp
 
         private async Task HandleStartNewGame()
         {
+            StopAttractMode();
             gameState = GameState.Playing;
 
             input.Clear();
@@ -221,7 +224,7 @@ namespace MeadowApp
 
             // We only need to update the entire display the first round.
             // Between each subsequent round we only need to update a smaller portion.
-            bool partialScreenUpdate = input.Count > 0;
+            bool partialScreenUpdate = pattern.Count > 1;
 
             display.ShowWaitScreen(pattern.Count, partialScreenUpdate);
 
@@ -276,6 +279,7 @@ namespace MeadowApp
                     highScore.ShowHighScores();
                     await Task.Delay(4000);
                     gameState = GameState.Attract;
+                    StartAttractMode();
                 }
             }
         }
@@ -306,6 +310,7 @@ namespace MeadowApp
                 highScore.ShowHighScores();
                 await Task.Delay(4000);
                 gameState = GameState.Attract;
+                StartAttractMode();
             }
         }
 
@@ -346,44 +351,68 @@ namespace MeadowApp
             {
                 ledOnboard.SetColor(Color.Green);
                 gameState = GameState.Attract;
+                StartAttractMode();
             }
         }
 
-        private async Task AttractMode()
+        private void StartAttractMode()
         {
+            Console.WriteLine("Starting attract mode thread...");
+            attractModeCancelleationTokenSource = new CancellationTokenSource();
+            var cancellationToken = attractModeCancelleationTokenSource.Token;
+            Task.Run(() => AttractMode(cancellationToken), cancellationToken);
+        }
+
+        private void StopAttractMode()
+        {
+            if (attractModeCancelleationTokenSource == null)
+                return;
+
+            Console.WriteLine("Ending attract mode thread...");
+            attractModeCancelleationTokenSource.Cancel();
+            attractModeCancelleationTokenSource.Dispose();
+        }
+
+        private async Task AttractMode(CancellationToken cancelleationToken)
+        {
+            Thread.CurrentThread.Name = "AttractMode";
+
             while (true)
             {
-                if (gameState != GameState.Attract)
-                {
-                    await Task.Delay(1000);
-                    continue;
-                }
-
                 display.ShowTitleScreen();
 
                 for (var i = 0; i < 10; i++)
                 {
                     await Task.Delay(500);
-                    if (gameState != GameState.Attract) { continue; }
+                    if (cancelleationToken.IsCancellationRequested)
+                    {
+                        Console.WriteLine("Attract mode cancellation requested; ending attract mode.");
+                        return;
+                    }
                 }
 
                 display.ShowAttractScreen();
 
                 for (var i = 0; i < 10; i++)
-                    await Task.Delay(500);
-
-                for (var i = 0; i < 15; i++)
                 {
                     await Task.Delay(500);
-                    if (gameState != GameState.Attract) { continue; }
+                    if (cancelleationToken.IsCancellationRequested)
+                    {
+                        Console.WriteLine("Attract mode cancellation requested; ending attract mode.");
+                        return;
+                    }
                 }
 
                 highScore.ShowHighScores();
 
-                for (var i = 0; i < 5; i++)
+                for (var i = 0; i < 10; i++)
                 {
                     await Task.Delay(500);
-                    if (gameState != GameState.Attract) { continue; }
+                    if (cancelleationToken.IsCancellationRequested)
+                    {
+                        Console.WriteLine("Attract mode cancellation requested; ending attract mode.");
+                        return;
+                    }
                 }
 
                 playNewGameEffect = true;
