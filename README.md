@@ -4,7 +4,9 @@ This is a toy project for the [Meadow F7v2 Feather](https://store.wildernesslabs
 
 It is a [Simon game](https://en.wikipedia.org/wiki/Simon_(game)) clone I built for an Easter themed project.
 
-`TODO: Picture here`
+| External View  | Internal View |
+|----------------|----------------|
+|![external](https://user-images.githubusercontent.com/1243565/235367970-c432eb6e-2fd2-4473-b56a-298395f58c41.jpg)|![internal](https://user-images.githubusercontent.com/1243565/235367971-f98e9545-12ce-4be7-8ec8-bc8e415dc391.jpg)|
 
 ## Hardware
 
